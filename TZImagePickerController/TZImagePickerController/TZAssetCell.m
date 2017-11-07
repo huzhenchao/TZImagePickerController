@@ -22,6 +22,7 @@
 @property (nonatomic, weak) UIImageView *videoImgView;
 @property (nonatomic, strong) TZProgressView *progressView;
 @property (nonatomic, assign) int32_t bigImageRequestID;
+@property (nonatomic, weak) UIImageView *blurImageView;
 @end
 
 @implementation TZAssetCell
@@ -56,12 +57,14 @@
     }
     self.imageRequestID = imageRequestID;
     self.selectPhotoButton.selected = model.isSelected;
+    self.numberLabel.hidden = !model.isSelected;
     self.selectImageView.image = self.selectPhotoButton.isSelected ? [UIImage imageNamedFromMyBundle:self.photoSelImageName] : [UIImage imageNamedFromMyBundle:self.photoDefImageName];
     self.type = (NSInteger)model.type;
     // 让宽度/高度小于 最小可选照片尺寸 的图片不能选中
     if (![[TZImageManager manager] isPhotoSelectableWithAsset:model.asset]) {
         if (_selectImageView.hidden == NO) {
             self.selectPhotoButton.hidden = YES;
+            self.numberLabel.hidden = YES;
             _selectImageView.hidden = YES;
         }
     }
@@ -69,7 +72,15 @@
     if (model.isSelected) {
         [self fetchBigImage];
     }
+    
+    self.blurImageView.hidden = !model.hasSelectedMax;
     [self setNeedsLayout];
+}
+
+-(void)setShowBlurView:(bool)showBlurView
+{
+    _showBlurView = showBlurView;
+    self.blurImageView.hidden = !_showBlurView;
 }
 
 - (void)setShowSelectBtn:(BOOL)showSelectBtn {
@@ -84,7 +95,7 @@
 
 - (void)setType:(TZAssetCellType)type {
     _type = type;
-    if (type == TZAssetCellTypePhoto || type == TZAssetCellTypeLivePhoto || (type == TZAssetCellTypePhotoGif && !self.allowPickingGif) || self.allowPickingMultipleVideo) {
+    if (type == TZAssetCellTypePhoto || type == TZAssetCellTypeLivePhoto || (type == TZAssetCellTypePhotoGif && !self.allowPickingGif) || (type == TZAssetCellTypeVideo && self.allowPickingMultipleVideo) || (type == TZAssetCellTypePhotoGif &&self.allowPickingGif &&  self.allowPickingMultipleGif)) {
         _selectImageView.hidden = NO;
         _selectPhotoButton.hidden = NO;
         _bottomView.hidden = YES;
@@ -94,17 +105,17 @@
     }
     
     if (type == TZAssetCellTypeVideo) {
+        _timeLength.tz_left = self.videoImgView.tz_right;
+        _timeLength.textAlignment = NSTextAlignmentRight;
         self.bottomView.hidden = NO;
         self.timeLength.text = _model.timeLength;
         self.videoImgView.hidden = NO;
-        _timeLength.tz_left = self.videoImgView.tz_right;
-        _timeLength.textAlignment = NSTextAlignmentRight;
     } else if (type == TZAssetCellTypePhotoGif && self.allowPickingGif) {
-        self.bottomView.hidden = NO;
-        self.timeLength.text = @"GIF";
-        self.videoImgView.hidden = YES;
         _timeLength.tz_left = 5;
         _timeLength.textAlignment = NSTextAlignmentLeft;
+        self.bottomView.hidden = NO;
+        self.videoImgView.hidden = YES;
+        self.timeLength.text = @"GIF";
     }
 }
 
@@ -114,10 +125,12 @@
     }
     self.selectImageView.image = sender.isSelected ? [UIImage imageNamedFromMyBundle:self.photoSelImageName] : [UIImage imageNamedFromMyBundle:self.photoDefImageName];
     if (sender.isSelected) {
+        //        _numberLabel.hidden = NO;
         [UIView showOscillatoryAnimationWithLayer:_selectImageView.layer type:TZOscillatoryAnimationToBigger];
         // 用户选中了该图片，提前获取一下大图
         [self fetchBigImage];
     } else { // 取消选中，取消大图的获取
+        //        _numberLabel.hidden = YES;
         if (_bigImageRequestID && _progressView) {
             [[PHImageManager defaultManager] cancelImageRequest:_bigImageRequestID];
             [self hideProgressView];
@@ -153,6 +166,21 @@
 
 #pragma mark - Lazy load
 
+- (UILabel *)numberLabel
+{
+    if (!_numberLabel) {
+        UILabel *numbeLabel = [[UILabel alloc] init];
+        numbeLabel.backgroundColor = [UIColor clearColor];
+        numbeLabel.font = [UIFont boldSystemFontOfSize:15];
+        numbeLabel.textColor = [UIColor whiteColor];
+        numbeLabel.textAlignment = NSTextAlignmentCenter;
+        [self.selectImageView addSubview:numbeLabel];
+        _numberLabel = numbeLabel;
+        _numberLabel.frame = _selectImageView.bounds;
+    }
+    return _numberLabel;
+}
+
 - (UIButton *)selectPhotoButton {
     if (_selectImageView == nil) {
         UIButton *selectPhotoButton = [[UIButton alloc] init];
@@ -170,11 +198,27 @@
         imageView.clipsToBounds = YES;
         [self.contentView addSubview:imageView];
         _imageView = imageView;
-        
+        _imageView.frame = CGRectMake(0, 0, self.tz_width, self.tz_height);
         [self.contentView bringSubviewToFront:_selectImageView];
+        [self.contentView bringSubviewToFront:_numberLabel];
         [self.contentView bringSubviewToFront:_bottomView];
     }
     return _imageView;
+}
+
+- (UIImageView *)blurImageView
+{
+    if (_blurImageView == nil) {
+        UIImageView *blurImageView = [[UIImageView alloc] init];
+        NSString *backgroudpath = [[NSBundle tz_imagePickerBundle] pathForResource:@"photo_whitebg" ofType:@"png"];
+        blurImageView.image = [UIImage imageWithContentsOfFile:backgroudpath];
+        [self.contentView addSubview:blurImageView];
+        _blurImageView = blurImageView;
+        //默认先隐藏
+        _blurImageView.hidden = YES;
+        _blurImageView.frame = self.bounds;
+    }
+    return _blurImageView;
 }
 
 - (UIImageView *)selectImageView {
@@ -182,6 +226,8 @@
         UIImageView *selectImageView = [[UIImageView alloc] init];
         [self.contentView addSubview:selectImageView];
         _selectImageView = selectImageView;
+        _selectImageView.hidden = YES;
+        _selectImageView.frame = CGRectMake(self.tz_width - 27, 0, 27, 27);
     }
     return _selectImageView;
 }
@@ -193,6 +239,8 @@
         bottomView.backgroundColor = [UIColor colorWithRed:rgb green:rgb blue:rgb alpha:0.8];
         [self.contentView addSubview:bottomView];
         _bottomView = bottomView;
+        _bottomView.hidden = YES;
+        _bottomView.frame = CGRectMake(0, self.tz_height - 17, self.tz_width, 17);
     }
     return _bottomView;
 }
@@ -203,6 +251,8 @@
         [videoImgView setImage:[UIImage imageNamedFromMyBundle:@"VideoSendIcon"]];
         [self.bottomView addSubview:videoImgView];
         _videoImgView = videoImgView;
+        _videoImgView.hidden = YES;
+        _videoImgView.frame = CGRectMake(8, 0, 17, 17);
     }
     return _videoImgView;
 }
@@ -215,6 +265,7 @@
         timeLength.textAlignment = NSTextAlignmentRight;
         [self.bottomView addSubview:timeLength];
         _timeLength = timeLength;
+        _timeLength.frame = CGRectMake(self.videoImgView.tz_right, 0, self.tz_width - self.videoImgView.tz_right - 5, 17);
     }
     return _timeLength;
 }
@@ -223,6 +274,9 @@
     if (_progressView == nil) {
         _progressView = [[TZProgressView alloc] init];
         _progressView.hidden = YES;
+        static CGFloat progressWH = 20;
+        CGFloat progressXY = (self.tz_width - progressWH) / 2;
+        _progressView.frame = CGRectMake(progressXY, progressXY, progressWH, progressWH);
         [self addSubview:_progressView];
     }
     return _progressView;
@@ -235,19 +289,21 @@
     } else {
         _selectPhotoButton.frame = self.bounds;
     }
-    _selectImageView.frame = CGRectMake(self.tz_width - 27, 0, 27, 27);
-    _imageView.frame = CGRectMake(0, 0, self.tz_width, self.tz_height);
+//    _selectImageView.frame = CGRectMake(self.tz_width - 27, 0, 27, 27);
+//    _imageView.frame = CGRectMake(0, 0, self.tz_width, self.tz_height);
+//    _numberLabel.frame = _selectImageView.bounds;
     
-    static CGFloat progressWH = 20;
-    CGFloat progressXY = (self.tz_width - progressWH) / 2;
-    _progressView.frame = CGRectMake(progressXY, progressXY, progressWH, progressWH);
-
-    _bottomView.frame = CGRectMake(0, self.tz_height - 17, self.tz_width, 17);
-    _videoImgView.frame = CGRectMake(8, 0, 17, 17);
-    _timeLength.frame = CGRectMake(self.videoImgView.tz_right, 0, self.tz_width - self.videoImgView.tz_right - 5, 17);
+//    static CGFloat progressWH = 20;
+//    CGFloat progressXY = (self.tz_width - progressWH) / 2;
+//    _progressView.frame = CGRectMake(progressXY, progressXY, progressWH, progressWH);
+    
+//    _bottomView.frame = CGRectMake(0, self.tz_height - 17, self.tz_width, 17);
+//    _videoImgView.frame = CGRectMake(8, 0, 17, 17);
+//    _timeLength.frame = CGRectMake(self.videoImgView.tz_right, 0, self.tz_width - self.videoImgView.tz_right - 5, 17);
     
     self.type = (NSInteger)self.model.type;
-    self.showSelectBtn = self.showSelectBtn;
+//    self.showSelectBtn = self.showSelectBtn;
+//    self.blurImageView.frame = self.bounds;
 }
 
 @end
@@ -275,21 +331,21 @@
     [[TZImageManager manager] getPostImageWithAlbumModel:model completion:^(UIImage *postImage) {
         self.posterImageView.image = postImage;
     }];
-    if (model.selectedCount) {
-        self.selectedCountButton.hidden = NO;
-        [self.selectedCountButton setTitle:[NSString stringWithFormat:@"%zd",model.selectedCount] forState:UIControlStateNormal];
-    } else {
-        self.selectedCountButton.hidden = YES;
-    }
+    //    if (model.selectedCount) {
+    //        self.selectedCountButton.hidden = NO;
+    //        [self.selectedCountButton setTitle:[NSString stringWithFormat:@"%zd",model.selectedCount] forState:UIControlStateNormal];
+    //    } else {
+    //        self.selectedCountButton.hidden = YES;
+    //    }
 }
 
 /// For fitting iOS6
 - (void)layoutSubviews {
     if (iOS7Later) [super layoutSubviews];
-    _selectedCountButton.frame = CGRectMake(self.tz_width - 24 - 30, 23, 24, 24);
-    NSInteger titleHeight = ceil(self.titleLabel.font.lineHeight);
-    self.titleLabel.frame = CGRectMake(80, (self.tz_height - titleHeight) / 2, self.tz_width - 80 - 50, titleHeight);
-    self.posterImageView.frame = CGRectMake(0, 0, 70, 70);
+    //    _selectedCountButton.frame = CGRectMake(self.tz_width - 24 - 30, 23, 24, 24);
+//    NSInteger titleHeight = ceil(self.titleLabel.font.lineHeight);
+//    self.titleLabel.frame = CGRectMake(80, (self.tz_height - titleHeight) / 2, self.tz_width - 80 - 50, titleHeight);
+//    self.posterImageView.frame = CGRectMake(0, 0, 70, 70);
 }
 
 - (void)layoutSublayersOfLayer:(CALayer *)layer {
@@ -305,6 +361,7 @@
         posterImageView.clipsToBounds = YES;
         [self.contentView addSubview:posterImageView];
         _posterImageView = posterImageView;
+        _posterImageView.frame = CGRectMake(0, 0, 70, 70);
     }
     return _posterImageView;
 }
@@ -317,23 +374,25 @@
         titleLabel.textAlignment = NSTextAlignmentLeft;
         [self.contentView addSubview:titleLabel];
         _titleLabel = titleLabel;
+        NSInteger titleHeight = ceil(self.titleLabel.font.lineHeight);
+        _titleLabel.frame = CGRectMake(80, (self.tz_height - titleHeight) / 2, self.tz_width - 80 - 50, titleHeight);
     }
     return _titleLabel;
 }
 
-- (UIButton *)selectedCountButton {
-    if (_selectedCountButton == nil) {
-        UIButton *selectedCountButton = [[UIButton alloc] init];
-        selectedCountButton.layer.cornerRadius = 12;
-        selectedCountButton.clipsToBounds = YES;
-        selectedCountButton.backgroundColor = [UIColor redColor];
-        [selectedCountButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-        selectedCountButton.titleLabel.font = [UIFont systemFontOfSize:15];
-        [self.contentView addSubview:selectedCountButton];
-        _selectedCountButton = selectedCountButton;
-    }
-    return _selectedCountButton;
-}
+//- (UIButton *)selectedCountButton {
+//    if (_selectedCountButton == nil) {
+//        UIButton *selectedCountButton = [[UIButton alloc] init];
+//        selectedCountButton.layer.cornerRadius = 12;
+//        selectedCountButton.clipsToBounds = YES;
+//        selectedCountButton.backgroundColor = [UIColor redColor];
+//        [selectedCountButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+//        selectedCountButton.titleLabel.font = [UIFont systemFontOfSize:15];
+//        [self.contentView addSubview:selectedCountButton];
+//        _selectedCountButton = selectedCountButton;
+//    }
+//    return _selectedCountButton;
+//}
 
 @end
 
@@ -348,6 +407,7 @@
         _imageView = [[UIImageView alloc] init];
         _imageView.backgroundColor = [UIColor colorWithWhite:1.000 alpha:0.500];
         _imageView.contentMode = UIViewContentModeScaleAspectFill;
+        _imageView.frame = self.bounds;
         [self addSubview:_imageView];
         self.clipsToBounds = YES;
     }
@@ -356,7 +416,7 @@
 
 - (void)layoutSubviews {
     [super layoutSubviews];
-    _imageView.frame = self.bounds;
+//    _imageView.frame = self.bounds;
 }
 
 @end

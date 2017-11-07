@@ -79,6 +79,7 @@ static CGFloat itemMargin = 5;
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:tzImagePickerVc.cancelBtnTitleStr style:UIBarButtonItemStylePlain target:tzImagePickerVc action:@selector(cancelButtonClick)];
     if (tzImagePickerVc.navLeftBarButtonSettingBlock) {
         UIButton *leftButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        leftButton.adjustsImageWhenHighlighted = NO;
         leftButton.frame = CGRectMake(0, 0, 44, 44);
         [leftButton addTarget:self action:@selector(navLeftBarButtonClick) forControlEvents:UIControlEventTouchUpInside];
         tzImagePickerVc.navLeftBarButtonSettingBlock(leftButton);
@@ -324,7 +325,11 @@ static CGFloat itemMargin = 5;
     [self.navigationController popViewControllerAnimated:YES];
 }
 - (void)previewButtonClick {
+    TZImagePickerController *tzImagePickerVc = (TZImagePickerController *)self.navigationController;
+    
     TZPhotoPreviewController *photoPreviewVc = [[TZPhotoPreviewController alloc] init];
+    photoPreviewVc.currentIndex = [tzImagePickerVc.selectedIndexes[0] integerValue];
+    photoPreviewVc.models = _models;
     [self pushPhotoPrevireViewController:photoPreviewVc];
 }
 
@@ -440,6 +445,7 @@ static CGFloat itemMargin = 5;
     // the cell dipaly photo or video / 展示照片或视频的cell
     TZAssetCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"TZAssetCell" forIndexPath:indexPath];
     cell.allowPickingMultipleVideo = tzImagePickerVc.allowPickingMultipleVideo;
+    cell.allowPickingMultipleGif = tzImagePickerVc.allowPickingMultipleGif;
     cell.photoDefImageName = tzImagePickerVc.photoDefImageName;
     cell.photoSelImageName = tzImagePickerVc.photoSelImageName;
     TZAssetModel *model;
@@ -452,6 +458,13 @@ static CGFloat itemMargin = 5;
     cell.model = model;
     cell.showSelectBtn = tzImagePickerVc.showSelectBtn;
     cell.allowPreview = tzImagePickerVc.allowPreview;
+    cell.backgroundColor = [UIColor blackColor];
+    [tzImagePickerVc.selectedIndexes enumerateObjectsUsingBlock:^(NSNumber *obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        if (indexPath.item == obj.integerValue) {
+            cell.numberLabel.text = [NSString stringWithFormat:@"%u", idx + 1];
+            *stop = YES;
+        }
+    }];
     
     __weak typeof(cell) weakCell = cell;
     __weak typeof(self) weakSelf = self;
@@ -461,6 +474,7 @@ static CGFloat itemMargin = 5;
         // 1. cancel select / 取消选择
         if (isSelected) {
             weakCell.selectPhotoButton.selected = NO;
+            weakCell.numberLabel.hidden = YES;
             model.isSelected = NO;
             NSArray *selectedModels = [NSArray arrayWithArray:tzImagePickerVc.selectedModels];
             for (TZAssetModel *model_item in selectedModels) {
@@ -469,14 +483,58 @@ static CGFloat itemMargin = 5;
                     break;
                 }
             }
+            
+            // 移除已选indexpath
+            for (NSNumber *selectedIndexes in tzImagePickerVc.selectedIndexes) {
+                if (indexPath.item == selectedIndexes.integerValue) {
+                    [tzImagePickerVc.selectedIndexes removeObject:selectedIndexes];
+                    break;
+                }
+            }
+            // 重设角标
+            [tzImagePickerVc.selectedIndexes enumerateObjectsUsingBlock:^(NSNumber *obj, NSUInteger idx, BOOL * _Nonnull stop) {
+                TZAssetCell *cell = (TZAssetCell *)[collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:obj.integerValue inSection:0]];
+                cell.numberLabel.text = [NSString stringWithFormat:@"%lu", idx + 1];
+            }];
+            // 设置不可选模糊图层(取消选择最后一个时再重新渲染)
+            if (tzImagePickerVc.selectedIndexes.count == tzImagePickerVc.maxImagesCount-1) {
+                [_models enumerateObjectsUsingBlock:^(TZAssetModel *model, NSUInteger idx, BOOL * _Nonnull stop) {
+                    model.hasSelectedMax = NO;
+                    TZAssetCell *cell = (TZAssetCell *)[collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:idx inSection:0]];
+                    cell.showBlurView = model.hasSelectedMax;
+                }];
+            }
             [weakSelf refreshBottomToolBarStatus];
         } else {
             // 2. select:check if over the maxImagesCount / 选择照片,检查是否超过了最大个数的限制
             if (tzImagePickerVc.selectedModels.count < tzImagePickerVc.maxImagesCount) {
                 weakCell.selectPhotoButton.selected = YES;
+                weakCell.numberLabel.hidden = NO;
                 model.isSelected = YES;
                 [tzImagePickerVc.selectedModels addObject:model];
+                // 设置选中角标
+                [tzImagePickerVc.selectedIndexes addObject:@(indexPath.item)];
+                [tzImagePickerVc.selectedIndexes enumerateObjectsUsingBlock:^(NSNumber *obj, NSUInteger idx, BOOL * _Nonnull stop) {
+                    TZAssetCell *cell = (TZAssetCell *)[collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:obj.integerValue inSection:0]];
+                    cell.numberLabel.text = [NSString stringWithFormat:@"%u", idx + 1];
+                }];
                 [weakSelf refreshBottomToolBarStatus];
+                // 设置不可选模糊图层
+                if (tzImagePickerVc.selectedIndexes.count == tzImagePickerVc.maxImagesCount) {
+                    NSMutableArray *selectedAssets = [NSMutableArray array];
+                    for (TZAssetModel *model in tzImagePickerVc.selectedModels) {
+                        [selectedAssets addObject:model.asset];
+                    }
+                    [_models enumerateObjectsUsingBlock:^(TZAssetModel *model, NSUInteger idx, BOOL * _Nonnull stop) {
+                        if ([[TZImageManager manager] isAssetsArray:selectedAssets containAsset:model.asset]) {
+                            model.hasSelectedMax = NO;
+                        } else {
+                            model.hasSelectedMax = YES;
+                        }
+                        TZAssetCell *cell = (TZAssetCell *)[collectionView cellForItemAtIndexPath:[NSIndexPath indexPathForItem:idx inSection:0]];
+                        cell.showBlurView = model.hasSelectedMax;
+                    }];
+                }
             } else {
                 NSString *title = [NSString stringWithFormat:[NSBundle tz_localizedStringForKey:@"Select a maximum of %zd photos"], tzImagePickerVc.maxImagesCount];
                 [tzImagePickerVc showAlertWithTitle:title];
@@ -499,6 +557,9 @@ static CGFloat itemMargin = 5;
         index = indexPath.row - 1;
     }
     TZAssetModel *model = _models[index];
+    if (model.hasSelectedMax) {
+        return;
+    }
     if (model.type == TZAssetModelMediaTypeVideo && !tzImagePickerVc.allowPickingMultipleVideo) {
         if (tzImagePickerVc.selectedModels.count > 0) {
             TZImagePickerController *imagePickerVc = (TZImagePickerController *)self.navigationController;
@@ -508,7 +569,7 @@ static CGFloat itemMargin = 5;
             videoPlayerVc.model = model;
             [self.navigationController pushViewController:videoPlayerVc animated:YES];
         }
-    } else if (model.type == TZAssetModelMediaTypePhotoGif && tzImagePickerVc.allowPickingGif && !tzImagePickerVc.allowPickingMultipleVideo) {
+    } else if (model.type == TZAssetModelMediaTypePhotoGif && tzImagePickerVc.allowPickingGif && !tzImagePickerVc.allowPickingMultipleGif) {
         if (tzImagePickerVc.selectedModels.count > 0) {
             TZImagePickerController *imagePickerVc = (TZImagePickerController *)self.navigationController;
             [imagePickerVc showAlertWithTitle:[NSBundle tz_localizedStringForKey:@"Can not choose both photo and GIF"]];
@@ -667,15 +728,44 @@ static CGFloat itemMargin = 5;
 }
 
 - (void)checkSelectedModels {
-    for (TZAssetModel *model in _models) {
+//    for (TZAssetModel *model in _models) {
+//        model.isSelected = NO;
+//        NSMutableArray *selectedAssets = [NSMutableArray array];
+//        TZImagePickerController *tzImagePickerVc = (TZImagePickerController *)self.navigationController;
+//        for (TZAssetModel *model in tzImagePickerVc.selectedModels) {
+//            [selectedAssets addObject:model.asset];
+//        }
+//        if ([[TZImageManager manager] isAssetsArray:selectedAssets containAsset:model.asset]) {
+//            model.isSelected = YES;
+//        }
+//    }
+    TZImagePickerController *tzImagePickerVc = (TZImagePickerController *)self.navigationController;
+    NSMutableArray *selectedAssets = [NSMutableArray array];
+    for (TZAssetModel *model in tzImagePickerVc.selectedModels) {
+        [selectedAssets addObject:model.asset];
+    }
+    bool isselectmax = NO;
+    if (tzImagePickerVc.selectedModels.count >= tzImagePickerVc.maxImagesCount) {
+        isselectmax = YES;
+    }
+    NSMutableArray *selectedIndexs = [NSMutableArray array];
+    [_models enumerateObjectsUsingBlock:^(TZAssetModel *model, NSUInteger idx, BOOL * _Nonnull stop) {
         model.isSelected = NO;
-        NSMutableArray *selectedAssets = [NSMutableArray array];
-        TZImagePickerController *tzImagePickerVc = (TZImagePickerController *)self.navigationController;
-        for (TZAssetModel *model in tzImagePickerVc.selectedModels) {
-            [selectedAssets addObject:model.asset];
-        }
+        model.hasSelectedMax = isselectmax;
         if ([[TZImageManager manager] isAssetsArray:selectedAssets containAsset:model.asset]) {
             model.isSelected = YES;
+            model.hasSelectedMax = NO;
+            //记录哪几个被选中了
+            [selectedIndexs addObject:[NSNumber numberWithUnsignedInteger:idx]];
+        }
+    }];
+    //重新按照用户选择的顺序排序
+    for (TZAssetModel *modelitem in tzImagePickerVc.selectedModels) {
+        for (NSNumber *idx in selectedIndexs) {
+            TZAssetModel *model = _models[[idx unsignedIntegerValue]];
+            if ([[[TZImageManager manager] getAssetIdentifier:model.asset] isEqualToString:[[TZImageManager manager] getAssetIdentifier:modelitem.asset]]) {
+                [tzImagePickerVc.selectedIndexes addObject:idx];
+            }
         }
     }
 }

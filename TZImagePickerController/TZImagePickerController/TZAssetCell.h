@@ -26,6 +26,7 @@ typedef enum : NSUInteger {
 @property (nonatomic, assign) TZAssetCellType type;
 @property (nonatomic, assign) BOOL allowPickingGif;
 @property (nonatomic, assign) BOOL allowPickingMultipleVideo;
+@property (nonatomic, assign) BOOL allowPickingMultipleGif;
 @property (nonatomic, copy) NSString *representedAssetIdentifier;
 @property (nonatomic, assign) int32_t imageRequestID;
 
@@ -35,6 +36,12 @@ typedef enum : NSUInteger {
 @property (nonatomic, assign) BOOL showSelectBtn;
 @property (assign, nonatomic) BOOL allowPreview;
 
+@property (nonatomic, weak) UILabel *numberLabel;
+@property (nonatomic, assign) BOOL allowPicking;
+/*!
+ * 显示遮罩
+ */
+@property(nonatomic,assign) bool showBlurView;
 @end
 
 
@@ -43,7 +50,7 @@ typedef enum : NSUInteger {
 @interface TZAlbumCell : UITableViewCell
 
 @property (nonatomic, strong) TZAlbumModel *model;
-@property (weak, nonatomic) UIButton *selectedCountButton;
+//@property (weak, nonatomic) UIButton *selectedCountButton;
 
 @end
 

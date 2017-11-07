@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="11762" systemVersion="16F73" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13196" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11757"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13174"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -21,8 +21,8 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" ambiguous="YES" keyboardDismissMode="onDrag" translatesAutoresizingMaskIntoConstraints="NO" id="AMD-xf-cz2">
-                                <rect key="frame" x="0.0" y="0.0" width="375" height="440"/>
+                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" keyboardDismissMode="onDrag" translatesAutoresizingMaskIntoConstraints="NO" id="AMD-xf-cz2">
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="454"/>
                                 <subviews>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="obE-hs-XLa" userLabel="View1">
                                         <rect key="frame" x="0.0" y="20" width="375" height="35"/>
@@ -175,7 +175,7 @@
                                                 <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
-                                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="9" borderStyle="roundedRect" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="37K-cO-hgf">
+                                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="3" borderStyle="roundedRect" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="37K-cO-hgf">
                                                 <rect key="frame" x="220" y="2" width="80" height="30"/>
                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
@@ -253,14 +253,23 @@
                                                     <action selector="allowPickingMultipleVideoSwitchClick:" destination="BYZ-38-t0r" eventType="valueChanged" id="auh-9d-aAW"/>
                                                 </connections>
                                             </switch>
-                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="允许多选视频/GIF图片" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7q9-aI-kbz">
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="允许多选视频/Gif" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7q9-aI-kbz">
                                                 <rect key="frame" x="0.0" y="0.0" width="200" height="35"/>
                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                 <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                                 <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
+                                            <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="2N4-3b-ndE">
+                                                <rect key="frame" x="290" y="2" width="51" height="31"/>
+                                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            </switch>
                                         </subviews>
+                                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                    </view>
+                                    <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="k0C-5E-sXi" userLabel="View12">
+                                        <rect key="frame" x="0.0" y="439" width="375" height="35"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                     </view>
                                 </subviews>
@@ -303,7 +312,6 @@
                                     <constraint firstAttribute="trailing" secondItem="obE-hs-XLa" secondAttribute="trailing" id="kZv-6I-6fD"/>
                                     <constraint firstItem="kJv-DR-NlY" firstAttribute="height" secondItem="wWK-ob-W4A" secondAttribute="height" id="kvY-3q-eeM"/>
                                     <constraint firstItem="wWK-ob-W4A" firstAttribute="trailing" secondItem="obE-hs-XLa" secondAttribute="trailing" id="mfr-E7-8po"/>
-                                    <constraint firstAttribute="height" constant="440" id="miA-vX-6Hr"/>
                                     <constraint firstItem="92q-n9-Zwf" firstAttribute="height" secondItem="VUP-wm-Ah2" secondAttribute="height" id="oBc-gA-ADs"/>
                                     <constraint firstItem="uex-bO-uvg" firstAttribute="trailing" secondItem="92q-n9-Zwf" secondAttribute="trailing" id="r2c-JO-oNO"/>
                                     <constraint firstItem="kBC-oD-k6h" firstAttribute="leading" secondItem="uex-bO-uvg" secondAttribute="leading" id="r9g-v8-5U7"/>
@@ -313,6 +321,7 @@
                                     <constraint firstItem="Qrr-87-KzM" firstAttribute="trailing" secondItem="gde-hr-2Sy" secondAttribute="trailing" id="vZF-Ly-XEP"/>
                                     <constraint firstItem="Z20-6k-hhA" firstAttribute="trailing" secondItem="kJv-DR-NlY" secondAttribute="trailing" id="w7j-cD-oSq"/>
                                     <constraint firstItem="uex-bO-uvg" firstAttribute="leading" secondItem="92q-n9-Zwf" secondAttribute="leading" id="yDZ-7l-FMk"/>
+                                    <constraint firstAttribute="bottom" secondItem="kBC-oD-k6h" secondAttribute="bottom" constant="14" id="zbf-cA-1bn"/>
                                 </constraints>
                             </scrollView>
                         </subviews>
@@ -322,6 +331,7 @@
                             <constraint firstItem="obE-hs-XLa" firstAttribute="width" secondItem="8bC-Xf-vdC" secondAttribute="width" id="BAt-Qs-VNJ"/>
                             <constraint firstItem="AMD-xf-cz2" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="O7i-qy-sG8"/>
                             <constraint firstItem="AMD-xf-cz2" firstAttribute="width" secondItem="8bC-Xf-vdC" secondAttribute="width" id="Oqp-06-c4N"/>
+                            <constraint firstItem="wfy-db-euE" firstAttribute="top" secondItem="AMD-xf-cz2" secondAttribute="bottom" constant="213" id="TwP-zW-DfX"/>
                             <constraint firstAttribute="trailing" secondItem="AMD-xf-cz2" secondAttribute="trailing" id="eJF-uE-CjV"/>
                         </constraints>
                     </view>
@@ -329,6 +339,7 @@
                         <outlet property="allowCropSwitch" destination="0ju-HJ-A06" id="PHl-Yf-uf2"/>
                         <outlet property="allowPickingGifSwitch" destination="zLj-vc-Xwz" id="1UG-vY-alU"/>
                         <outlet property="allowPickingImageSwitch" destination="iRQ-aE-1KG" id="V7a-u6-cLv"/>
+                        <outlet property="allowPickingMuitlpleGifSwitch" destination="2N4-3b-ndE" id="1r5-6X-5gb"/>
                         <outlet property="allowPickingMuitlpleVideoSwitch" destination="edM-ah-5KZ" id="VUN-EN-OaU"/>
                         <outlet property="allowPickingOriginalPhotoSwitch" destination="4L3-Da-pcd" id="KFm-Zl-dpD"/>
                         <outlet property="allowPickingVideoSwitch" destination="a58-aK-ZB0" id="9Ti-hW-QRj"/>
@@ -343,7 +354,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="367.19999999999999" y="317.99100449775113"/>
+            <point key="canvasLocation" x="-538.39999999999998" y="245.12743628185908"/>
         </scene>
     </scenes>
 </document>

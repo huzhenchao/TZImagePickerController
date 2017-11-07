@@ -38,6 +38,8 @@
 - (instancetype)initWithSelectedAssets:(NSMutableArray *)selectedAssets selectedPhotos:(NSMutableArray *)selectedPhotos index:(NSInteger)index;
 /// This init method for crop photo / 用这个初始化方法以裁剪图片
 - (instancetype)initCropTypeWithAsset:(id)asset photo:(UIImage *)photo completion:(void (^)(UIImage *cropImage,id asset))completion;
+// 发表页面预览
+- (instancetype)initWithSelectedAssetsForPublish:(NSMutableArray *)selectedAssets selectedPhotos:(NSMutableArray *)selectedPhotos index:(NSInteger)index;
 
 /// Default is 9 / 默认最大可选9张图片
 @property (nonatomic, assign) NSInteger maxImagesCount;
@@ -73,7 +75,7 @@
 @property (nonatomic, assign) BOOL allowPickingVideo;
 /// Default is NO / 默认为NO，为YES时可以多选视频/gif图片，和照片共享最大可选张数maxImagesCount的限制
 @property (nonatomic, assign) BOOL allowPickingMultipleVideo;
-
+@property (nonatomic, assign) BOOL allowPickingMultipleGif;
 /// Default is NO, if set YES, user can picking gif image.
 /// 默认为NO，如果设置为YES,用户可以选择gif图片
 @property (nonatomic, assign) BOOL allowPickingGif;
@@ -97,8 +99,9 @@
 /// The photos user have selected
 /// 用户选中过的图片数组
 @property (nonatomic, strong) NSMutableArray *selectedAssets;
-@property (nonatomic, strong) NSMutableArray<TZAssetModel *> *selectedModels;
-
+@property (nonatomic, strong) NSMutableArray *selectedModels;
+// 选中的index
+@property (nonatomic, strong) NSMutableArray *selectedIndexes;
 /// Minimum selectable photo width, Default is 0
 /// 最小可选中的图片宽度，默认是0，小于这个宽度的图片不可选中
 @property (nonatomic, assign) NSInteger minPhotoWidthSelectable;
@@ -234,4 +237,3 @@
 @interface NSString (TzExtension)
 - (BOOL)tz_containsString:(NSString *)string;
 @end
-

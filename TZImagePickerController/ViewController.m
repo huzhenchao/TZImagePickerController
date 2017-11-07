@@ -18,6 +18,7 @@
 #import "TZPhotoPreviewController.h"
 #import "TZGifPhotoPreviewController.h"
 #import "TZLocationManager.h"
+#import "TZPhotoPreviewDeleteViewController.h"
 
 @interface ViewController ()<TZImagePickerControllerDelegate,UICollectionViewDataSource,UICollectionViewDelegate,UIActionSheetDelegate,UIImagePickerControllerDelegate,UIAlertViewDelegate,UINavigationControllerDelegate> {
     NSMutableArray *_selectedPhotos;
@@ -46,6 +47,7 @@
 @property (weak, nonatomic) IBOutlet UISwitch *allowCropSwitch;
 @property (weak, nonatomic) IBOutlet UISwitch *needCircleCropSwitch;
 @property (weak, nonatomic) IBOutlet UISwitch *allowPickingMuitlpleVideoSwitch;
+@property (weak, nonatomic) IBOutlet UISwitch *allowPickingMuitlpleGifSwitch;
 @end
 
 @implementation ViewController
@@ -162,7 +164,7 @@
             ALAsset *alAsset = asset;
             isVideo = [[alAsset valueForProperty:ALAssetPropertyType] isEqualToString:ALAssetTypeVideo];
         }
-        if ([[asset valueForKey:@"filename"] tz_containsString:@"GIF"] && self.allowPickingGifSwitch.isOn && !self.allowPickingMuitlpleVideoSwitch.isOn) {
+        if ([[asset valueForKey:@"filename"] tz_containsString:@"GIF"] && self.allowPickingGifSwitch.isOn && !self.allowPickingMuitlpleGifSwitch.isOn) {
             TZGifPhotoPreviewController *vc = [[TZGifPhotoPreviewController alloc] init];
             TZAssetModel *model = [TZAssetModel modelWithAsset:asset type:TZAssetModelMediaTypePhotoGif timeLength:@""];
             vc.model = model;
@@ -173,11 +175,12 @@
             vc.model = model;
             [self presentViewController:vc animated:YES completion:nil];
         } else { // preview photos / 预览照片
-            TZImagePickerController *imagePickerVc = [[TZImagePickerController alloc] initWithSelectedAssets:_selectedAssets selectedPhotos:_selectedPhotos index:indexPath.row];
+            TZImagePickerController *imagePickerVc = [[TZImagePickerController alloc] initWithSelectedAssetsForPublish:_selectedAssets selectedPhotos:_selectedPhotos index:indexPath.row];
             imagePickerVc.maxImagesCount = self.maxCountTF.text.integerValue;
             imagePickerVc.allowPickingGif = self.allowPickingGifSwitch.isOn;
             imagePickerVc.allowPickingOriginalPhoto = self.allowPickingOriginalPhotoSwitch.isOn;
             imagePickerVc.allowPickingMultipleVideo = self.allowPickingMuitlpleVideoSwitch.isOn;
+            imagePickerVc.allowPickingMultipleGif = self.allowPickingMuitlpleGifSwitch.isOn;
             imagePickerVc.isSelectOriginalPhoto = _isSelectOriginalPhoto;
             [imagePickerVc setDidFinishPickingPhotosHandle:^(NSArray<UIImage *> *photos, NSArray *assets, BOOL isSelectOriginalPhoto) {
                 _selectedPhotos = [NSMutableArray arrayWithArray:photos];
@@ -226,10 +229,7 @@
 #pragma mark - 五类个性化设置，这些参数都可以不传，此时会走默认设置
     imagePickerVc.isSelectOriginalPhoto = _isSelectOriginalPhoto;
     
-    if (self.maxCountTF.text.integerValue > 1) {
-        // 1.设置目前已经选中的图片数组
-        imagePickerVc.selectedAssets = _selectedAssets; // 目前已经选中的图片数组
-    }
+
     imagePickerVc.allowTakePicture = self.showTakePhotoBtnSwitch.isOn; // 在内部显示拍照按钮
     
     // imagePickerVc.photoWidth = 1000;
@@ -248,6 +248,7 @@
     imagePickerVc.allowPickingOriginalPhoto = self.allowPickingOriginalPhotoSwitch.isOn;
     imagePickerVc.allowPickingGif = self.allowPickingGifSwitch.isOn;
     imagePickerVc.allowPickingMultipleVideo = self.allowPickingMuitlpleVideoSwitch.isOn; // 是否可以多选视频
+    imagePickerVc.allowPickingMultipleGif = self.allowPickingMuitlpleGifSwitch.isOn; // 是否可以多选gif
     
     // 4. 照片排列按修改时间升序
     imagePickerVc.sortAscendingByModificationDate = self.sortAscendingSwitch.isOn;
@@ -287,6 +288,12 @@
     */
     
     imagePickerVc.isStatusBarDefault = NO;
+    
+    if (self.maxCountTF.text.integerValue > 1) {
+        // 1.设置目前已经选中的图片数组
+        imagePickerVc.selectedAssets = _selectedAssets; // 目前已经选中的图片数组
+    }
+    
 #pragma mark - 到这里为止
     
     // You can get the photos by block, the same as by delegate.
@@ -620,7 +627,7 @@
     if (sender.isOn) {
         [_allowPickingImageSwitch setOn:YES animated:YES];
     } else if (!self.allowPickingVideoSwitch.isOn) {
-        [self.allowPickingMuitlpleVideoSwitch setOn:NO animated:YES];
+        [self.allowPickingMuitlpleGifSwitch setOn:NO animated:YES];
     }
 }
 
