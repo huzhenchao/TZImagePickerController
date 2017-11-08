@@ -567,6 +567,8 @@ static CGFloat itemMargin = 5;
         } else {
             TZVideoPlayerController *videoPlayerVc = [[TZVideoPlayerController alloc] init];
             videoPlayerVc.model = model;
+            videoPlayerVc.maxVideoLength = tzImagePickerVc.maxVideoLength;
+            videoPlayerVc.outVideoLength = tzImagePickerVc.outVideoLength;
             [self.navigationController pushViewController:videoPlayerVc animated:YES];
         }
     } else if (model.type == TZAssetModelMediaTypePhotoGif && tzImagePickerVc.allowPickingGif && !tzImagePickerVc.allowPickingMultipleGif) {

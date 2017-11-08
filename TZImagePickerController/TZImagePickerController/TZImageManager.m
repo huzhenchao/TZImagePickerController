@@ -699,6 +699,23 @@ static dispatch_once_t onceToken;
     }
 }
 
+- (void)getVideoUrlWithAsset:(id)asset completion:(void (^)(NSURL * url))completion{
+    if ([asset isKindOfClass:[PHAsset class]]) {
+        PHVideoRequestOptions *options = [[PHVideoRequestOptions alloc] init];
+        options.version = PHImageRequestOptionsVersionCurrent;
+        options.deliveryMode = PHVideoRequestOptionsDeliveryModeAutomatic;
+        [[PHImageManager defaultManager] requestAVAssetForVideo:asset options:options resultHandler:^(AVAsset * _Nullable asset, AVAudioMix * _Nullable audioMix, NSDictionary * _Nullable info) {
+            AVURLAsset *urlAsset = (AVURLAsset *)asset;
+            if (completion) completion(urlAsset.URL);
+        }];
+    } else if ([asset isKindOfClass:[ALAsset class]]) {
+        ALAsset *alAsset = (ALAsset *)asset;
+        ALAssetRepresentation *defaultRepresentation = [alAsset defaultRepresentation];
+        NSString *uti = [defaultRepresentation UTI];
+        NSURL *videoURL = [[asset valueForProperty:ALAssetPropertyURLs] valueForKey:uti];
+        if (completion) completion(videoURL);
+    }
+}
 #pragma mark - Export video
 
 /// Export Video / 导出视频

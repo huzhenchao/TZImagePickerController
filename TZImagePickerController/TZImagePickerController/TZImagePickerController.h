@@ -40,7 +40,14 @@
 - (instancetype)initCropTypeWithAsset:(id)asset photo:(UIImage *)photo completion:(void (^)(UIImage *cropImage,id asset))completion;
 // 发表页面预览
 - (instancetype)initWithSelectedAssetsForPublish:(NSMutableArray *)selectedAssets selectedPhotos:(NSMutableArray *)selectedPhotos index:(NSInteger)index;
-
+/*!
+ * 最长可选择视频时长,单位：秒
+ */
+@property(nonatomic,assign) NSInteger maxVideoLength;
+/*!
+ * 输出最大时长,超过后自定义截取,单位：秒
+ */
+@property(nonatomic,assign) NSInteger outVideoLength;
 /// Default is 9 / 默认最大可选9张图片
 @property (nonatomic, assign) NSInteger maxImagesCount;
 

@@ -249,7 +249,8 @@
     imagePickerVc.allowPickingGif = self.allowPickingGifSwitch.isOn;
     imagePickerVc.allowPickingMultipleVideo = self.allowPickingMuitlpleVideoSwitch.isOn; // 是否可以多选视频
     imagePickerVc.allowPickingMultipleGif = self.allowPickingMuitlpleGifSwitch.isOn; // 是否可以多选gif
-    
+    imagePickerVc.maxVideoLength = 300;
+    imagePickerVc.outVideoLength = 10;
     // 4. 照片排列按修改时间升序
     imagePickerVc.sortAscendingByModificationDate = self.sortAscendingSwitch.isOn;
     

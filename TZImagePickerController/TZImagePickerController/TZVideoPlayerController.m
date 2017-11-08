@@ -8,11 +8,13 @@
 
 #import "TZVideoPlayerController.h"
 #import <MediaPlayer/MediaPlayer.h>
+#import <AssetsLibrary/AssetsLibrary.h>
 #import "UIView+Layout.h"
 #import "TZImageManager.h"
 #import "TZAssetModel.h"
 #import "TZImagePickerController.h"
 #import "TZPhotoPreviewController.h"
+#import "TJPlayerViewController.h"
 
 @interface TZVideoPlayerController () {
     AVPlayer *_player;
@@ -21,6 +23,7 @@
     UIImage *_cover;
     
     UIView *_toolBar;
+    UILabel *_msglb;
     UIButton *_doneButton;
     UIProgressView *_progress;
     
@@ -68,6 +71,7 @@
             [self addProgressObserver];
             [self configPlayButton];
             [self configBottomToolBar];
+            [self settingMsgandBtn];
             [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(pausePlayerAndShowNaviBar) name:AVPlayerItemDidPlayToEndTimeNotification object:_player.currentItem];
         });
     }];
@@ -98,10 +102,15 @@
     _toolBar = [[UIView alloc] initWithFrame:CGRectZero];
     CGFloat rgb = 34 / 255.0;
     _toolBar.backgroundColor = [UIColor colorWithRed:rgb green:rgb blue:rgb alpha:0.7];
-    
+    _msglb = [[UILabel alloc]init];
+    _msglb.font = [UIFont systemFontOfSize:14];
+    _msglb.numberOfLines = 0;
+    _msglb.textColor = [UIColor whiteColor];
+    [_toolBar addSubview:_msglb];
     _doneButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    _doneButton.tag = 0;
     _doneButton.titleLabel.font = [UIFont systemFontOfSize:16];
-    [_doneButton addTarget:self action:@selector(doneButtonClick) forControlEvents:UIControlEventTouchUpInside];
+    [_doneButton addTarget:self action:@selector(doneButtonClick:) forControlEvents:UIControlEventTouchUpInside];
     TZImagePickerController *tzImagePickerVc = (TZImagePickerController *)self.navigationController;
     if (tzImagePickerVc) {
         [_doneButton setTitle:tzImagePickerVc.doneBtnTitleStr forState:UIControlStateNormal];
@@ -114,6 +123,27 @@
     [self.view addSubview:_toolBar];
 }
 
+- (void)settingMsgandBtn {
+    double _duration = 0.0;
+    if ([self.model.asset isKindOfClass:[PHAsset class]]) {
+        PHAsset *phAsset = (PHAsset *)self.model.asset;
+        _duration = phAsset.duration;
+    } else {
+        _duration = [[self.model.asset valueForProperty:ALAssetPropertyDuration] doubleValue];
+    }
+    //大于最大可选时长时
+    if (_duration > self.maxVideoLength && self.maxVideoLength != 0) {
+        //提示不能选择此视频
+        _msglb.text = [NSString stringWithFormat:[NSBundle tz_localizedStringForKey:@"You can't choose videos more than %d minutes"], self.maxVideoLength/60];
+        _doneButton.hidden = YES;
+    }
+    //介于中间进行编辑
+    else if(self.outVideoLength < _duration && _duration < self.maxVideoLength){
+        _msglb.text = [NSString stringWithFormat:[NSBundle tz_localizedStringForKey:@"Only %d seconds of the video, you need to edit"], self.outVideoLength];
+        _doneButton.tag = 1;
+        [_doneButton setTitle:[NSBundle tz_localizedStringForKey:@"Edit"] forState:UIControlStateNormal];
+    }
+}
 #pragma mark - Layout
 
 - (void)viewDidLayoutSubviews {
@@ -121,6 +151,7 @@
     
     _playerLayer.frame = self.view.bounds;
     _playButton.frame = CGRectMake(0, 64, self.view.tz_width, self.view.tz_height - 64 - 44);
+    _msglb.frame = CGRectMake(6, 0, self.view.tz_width - 44 - 12 - 6, 44);
     _doneButton.frame = CGRectMake(self.view.tz_width - 44 - 12, 0, 44, 44);
     _toolBar.frame = CGRectMake(0, self.view.tz_height - 44, self.view.tz_width, 44);
 }
@@ -144,7 +175,7 @@
     }
 }
 
-- (void)doneButtonClick {
+-(void)callBack{
     TZImagePickerController *imagePickerVc = (TZImagePickerController *)self.navigationController;
     if (self.navigationController) {
         if (imagePickerVc.autoDismiss) {
@@ -157,6 +188,28 @@
     } else {
         [self dismissViewControllerAnimated:YES completion:^{
             [self callDelegateMethod];
+        }];
+    }
+}
+
+- (void)doneButtonClick:(UIButton *)sender {
+    //正常情况
+    if (sender.tag == 0) {
+        [self callBack];
+    }
+    //需要剪切视频
+    else{
+        [[TZImageManager manager] getVideoUrlWithAsset:_model.asset completion:^(NSURL *url) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                TJPlayerViewController *pvc = [[TJPlayerViewController alloc] init];
+                pvc.videoUrl = url;
+                pvc.maxSelectArea = self.outVideoLength;
+                pvc.cutDoneBlock = ^(PHAsset *asset) {
+                    _model.asset = asset;
+                    [self callBack];
+                };
+                [self.navigationController pushViewController:pvc animated:YES];
+            });
         }];
     }
 }

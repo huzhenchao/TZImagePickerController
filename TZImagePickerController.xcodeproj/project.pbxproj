@@ -34,6 +34,10 @@
 		90CE84AE1C3A89EF003D0779 /* TZImageManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 90CE84AD1C3A89EF003D0779 /* TZImageManager.m */; };
 		90CE84B71C3BABB6003D0779 /* TZVideoPlayerController.m in Sources */ = {isa = PBXBuildFile; fileRef = 90CE84B61C3BABB6003D0779 /* TZVideoPlayerController.m */; };
 		90EBF5D61C2E298000CB9BCC /* UIView+Layout.m in Sources */ = {isa = PBXBuildFile; fileRef = 90EBF5D51C2E298000CB9BCC /* UIView+Layout.m */; };
+		CB3A677E1FB299EA00EC75EB /* TimeChooseView.m in Sources */ = {isa = PBXBuildFile; fileRef = CB3A67771FB299E900EC75EB /* TimeChooseView.m */; };
+		CB3A677F1FB299EA00EC75EB /* TJMediaManager.m in Sources */ = {isa = PBXBuildFile; fileRef = CB3A67791FB299E900EC75EB /* TJMediaManager.m */; };
+		CB3A67801FB299EA00EC75EB /* TJPhotoManager.m in Sources */ = {isa = PBXBuildFile; fileRef = CB3A677B1FB299E900EC75EB /* TJPhotoManager.m */; };
+		CB3A67811FB299EA00EC75EB /* TJPlayerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CB3A677D1FB299E900EC75EB /* TJPlayerViewController.m */; };
 		CBB1009F1FAB23610024185A /* TZPhotoPreviewDeleteViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CBB1009E1FAB23610024185A /* TZPhotoPreviewDeleteViewController.m */; };
 /* End PBXBuildFile section */
 
@@ -108,6 +112,14 @@
 		90CE84B61C3BABB6003D0779 /* TZVideoPlayerController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TZVideoPlayerController.m; sourceTree = "<group>"; };
 		90EBF5D41C2E298000CB9BCC /* UIView+Layout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+Layout.h"; sourceTree = "<group>"; };
 		90EBF5D51C2E298000CB9BCC /* UIView+Layout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+Layout.m"; sourceTree = "<group>"; };
+		CB3A67761FB299E900EC75EB /* TimeChooseView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TimeChooseView.h; sourceTree = "<group>"; };
+		CB3A67771FB299E900EC75EB /* TimeChooseView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TimeChooseView.m; sourceTree = "<group>"; };
+		CB3A67781FB299E900EC75EB /* TJMediaManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TJMediaManager.h; sourceTree = "<group>"; };
+		CB3A67791FB299E900EC75EB /* TJMediaManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TJMediaManager.m; sourceTree = "<group>"; };
+		CB3A677A1FB299E900EC75EB /* TJPhotoManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TJPhotoManager.h; sourceTree = "<group>"; };
+		CB3A677B1FB299E900EC75EB /* TJPhotoManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TJPhotoManager.m; sourceTree = "<group>"; };
+		CB3A677C1FB299E900EC75EB /* TJPlayerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TJPlayerViewController.h; sourceTree = "<group>"; };
+		CB3A677D1FB299E900EC75EB /* TJPlayerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TJPlayerViewController.m; sourceTree = "<group>"; };
 		CBB1009D1FAB23610024185A /* TZPhotoPreviewDeleteViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TZPhotoPreviewDeleteViewController.h; sourceTree = "<group>"; };
 		CBB1009E1FAB23610024185A /* TZPhotoPreviewDeleteViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TZPhotoPreviewDeleteViewController.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -218,6 +230,7 @@
 		900EEFF51C2BBF7600EA709B /* TZImagePickerController */ = {
 			isa = PBXGroup;
 			children = (
+				CB3A67751FB299E900EC75EB /* videotrim */,
 				900EEFF61C2BBF9500EA709B /* TZImagePickerController.h */,
 				900EEFF71C2BBF9500EA709B /* TZImagePickerController.m */,
 				900EEFFC1C2BD58B00EA709B /* TZPhotoPickerController.h */,
@@ -260,6 +273,21 @@
 				903996921F447604005E77C2 /* Photos.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		CB3A67751FB299E900EC75EB /* videotrim */ = {
+			isa = PBXGroup;
+			children = (
+				CB3A67761FB299E900EC75EB /* TimeChooseView.h */,
+				CB3A67771FB299E900EC75EB /* TimeChooseView.m */,
+				CB3A67781FB299E900EC75EB /* TJMediaManager.h */,
+				CB3A67791FB299E900EC75EB /* TJMediaManager.m */,
+				CB3A677A1FB299E900EC75EB /* TJPhotoManager.h */,
+				CB3A677B1FB299E900EC75EB /* TJPhotoManager.m */,
+				CB3A677C1FB299E900EC75EB /* TJPlayerViewController.h */,
+				CB3A677D1FB299E900EC75EB /* TJPlayerViewController.m */,
+			);
+			path = videotrim;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -403,13 +431,17 @@
 				900EF0021C2BD7E400EA709B /* TZAssetCell.m in Sources */,
 				6DD0502B1DF659ED0057C78D /* TZProgressView.m in Sources */,
 				6D32B9BD1CD83640005CE1E0 /* LxGridViewFlowLayout.m in Sources */,
+				CB3A677F1FB299EA00EC75EB /* TJMediaManager.m in Sources */,
 				6D4608311DFFC60D004FB009 /* TZGifPhotoPreviewController.m in Sources */,
 				900EF0161C2C134900EA709B /* TZPhotoPreviewCell.m in Sources */,
 				900E65871C2BB8D5003D9A9E /* ViewController.m in Sources */,
+				CB3A677E1FB299EA00EC75EB /* TimeChooseView.m in Sources */,
+				CB3A67811FB299EA00EC75EB /* TJPlayerViewController.m in Sources */,
 				90CE84AE1C3A89EF003D0779 /* TZImageManager.m in Sources */,
 				900E65841C2BB8D5003D9A9E /* AppDelegate.m in Sources */,
 				900E65811C2BB8D5003D9A9E /* main.m in Sources */,
 				900EF0121C2C107400EA709B /* TZPhotoPreviewController.m in Sources */,
+				CB3A67801FB299EA00EC75EB /* TJPhotoManager.m in Sources */,
 				CBB1009F1FAB23610024185A /* TZPhotoPreviewDeleteViewController.m in Sources */,
 				6D5358CD1D64600F00928CC6 /* NSBundle+TZImagePicker.m in Sources */,
 				900EEFF81C2BBF9500EA709B /* TZImagePickerController.m in Sources */,
